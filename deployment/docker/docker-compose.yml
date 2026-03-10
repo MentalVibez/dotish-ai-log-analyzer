@@ -1,0 +1,16 @@
+# Run from repo root: docker compose -f deployment/docker/docker-compose.yml up --build
+# Ollama: run separately (host or another service); set OLLAMA_BASE_URL accordingly.
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../../.env
+    environment:
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama2}
+    restart: unless-stopped

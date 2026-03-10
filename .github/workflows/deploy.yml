@@ -1,0 +1,23 @@
+# Optional: enable when app is stable and you have EC2/registry set up.
+# Triggers: manual (workflow_dispatch) or on release tag.
+# Steps: build image, push to ECR (or other registry), SSH to EC2 and pull/restart.
+# For MVP, deploy manually; use this as a template for CD later.
+
+name: Deploy
+
+on:
+  workflow_dispatch:
+  # push:
+  #   tags: ['v*']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # environment: production
+    steps:
+      - name: Placeholder
+        run: echo "Add build + push + deploy steps (EC2, ECR, systemd restart)"
+      # - uses: actions/checkout@v4
+      # - name: Configure AWS / ECR
+      # - name: Build and push Docker image
+      # - name: Deploy to EC2 (SSH + docker pull + restart)

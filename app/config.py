@@ -22,5 +22,8 @@ class Settings(BaseSettings):
     # Limit log size sent to LLM
     max_log_lines: int = 5000
 
+    # CORS: comma-separated origins or "*" (production: set to your front-end origin(s))
+    cors_origins: str = "*"
+
 
 settings = Settings()

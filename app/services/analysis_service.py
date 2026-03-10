@@ -1,6 +1,5 @@
 from app.config import settings
 from app.models.analysis_result import AnalysisResult
-from app.models.log_event import LogEvent
 from app.ai.llm_client import run_full_analysis
 from app.services.parsing_service import parse
 

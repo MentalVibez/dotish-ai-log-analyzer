@@ -1,8 +1,4 @@
-from datetime import datetime
-
-import pytest
-
-from app.models.log_event import LogEvent, LogLevel
+from app.models.log_event import LogLevel
 from app.parsers.nginx_parser import NginxParser
 from app.parsers.syslog_parser import SyslogParser
 
