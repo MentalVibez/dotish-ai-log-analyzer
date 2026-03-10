@@ -41,6 +41,29 @@ class TestReportService:
         assert out["root_causes"] == ["cause1"]
         assert len(out["suggested_fixes"]) == 1
         assert out["suggested_fixes"][0]["fix"] == "do X"
+        assert "recurring_issues" in out
+        assert isinstance(out["recurring_issues"], list)
+        assert len(out["recurring_issues"]) == 1
+        assert out["recurring_issues"][0]["message"] == "e1"
+        assert out["recurring_issues"][0]["count"] == 1
+
+    def test_recurring_issues_groups_duplicates(self):
+        result = AnalysisResult(
+            errors=[
+                LogEvent(level=LogLevel.ERROR, message="connection refused", source="nginx", raw=""),
+                LogEvent(level=LogLevel.ERROR, message="connection refused", source="nginx", raw=""),
+                LogEvent(level=LogLevel.ERROR, message="timeout", source="nginx", raw=""),
+            ],
+            warnings=[],
+            root_causes=[],
+            suggested_fixes=[],
+        )
+        out = format_for_api(result)
+        recurring = out["recurring_issues"]
+        assert len(recurring) == 2
+        by_msg = {r["message"]: r["count"] for r in recurring}
+        assert by_msg["connection refused"] == 2
+        assert by_msg["timeout"] == 1
 
 
 class TestAnalysisService:

@@ -43,6 +43,10 @@
       <div id="warnings"></div>
     </section>
     <section>
+      <h2>Recurring issues</h2>
+      <div id="recurring"></div>
+    </section>
+    <section>
       <h2>Root causes</h2>
       <div id="root-causes"></div>
     </section>
@@ -60,6 +64,7 @@
     const results = document.getElementById('results');
     const errorsEl = document.getElementById('errors');
     const warningsEl = document.getElementById('warnings');
+    const recurringEl = document.getElementById('recurring');
     const rootCausesEl = document.getElementById('root-causes');
     const fixesEl = document.getElementById('fixes');
 
@@ -113,6 +118,13 @@
         }
         renderEvents(data.errors, errorsEl);
         renderEvents(data.warnings, warningsEl);
+        if (!data.recurring_issues || data.recurring_issues.length === 0) {
+          recurringEl.innerHTML = '<p class="empty">None</p>';
+        } else {
+          recurringEl.innerHTML = data.recurring_issues.map(r =>
+            `<div class="card"><pre>${escapeHtml(r.message)}</pre><p>Count: ${r.count}</p></div>`
+          ).join('');
+        }
         if (!data.root_causes || data.root_causes.length === 0) {
           rootCausesEl.innerHTML = '<p class="empty">None</p>';
         } else {

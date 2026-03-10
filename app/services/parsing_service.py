@@ -1,14 +1,14 @@
 from app.models.log_event import LogEvent
-from app.parsers import NginxParser, SyslogParser
+from app.parsers import DockerParser, NginxParser, SyslogParser
 from app.parsers.base_parser import BaseLogParser
 
-_PARSERS: list[BaseLogParser] = [NginxParser(), SyslogParser()]
+_PARSERS: list[BaseLogParser] = [NginxParser(), SyslogParser(), DockerParser()]
 
 
 def parse(content: str, filename: str | None = None, parser_hint: str | None = None) -> list[LogEvent]:
     """
     Parse log content into a list of LogEvent.
-    If parser_hint is given ('nginx' or 'syslog'), use that parser; else auto-detect from first lines.
+    If parser_hint is given ('nginx', 'syslog', or 'docker'), use that parser; else auto-detect from first lines.
     """
     lines = content.splitlines()
     if not lines:

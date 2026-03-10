@@ -1,4 +1,5 @@
 from app.models.log_event import LogLevel
+from app.parsers.docker_parser import DockerParser
 from app.parsers.nginx_parser import NginxParser
 from app.parsers.syslog_parser import SyslogParser
 
@@ -69,3 +70,33 @@ class TestSyslogParser:
         assert len(events) == 1
         assert events[0].message == "test message"
         assert events[0].source == "syslog"
+
+
+class TestDockerParser:
+    def test_can_handle_json_log(self):
+        parser = DockerParser()
+        line = '{"log":"error: connection refused\\n","stream":"stderr","time":"2024-01-15T12:00:00Z"}'
+        assert parser.can_handle(line) is True
+
+    def test_can_handle_raw_docker_line(self):
+        parser = DockerParser()
+        line = "2024-01-15T12:00:00.123456789Z stdout F message here"
+        assert parser.can_handle(line) is True
+
+    def test_parse_json_log(self):
+        parser = DockerParser()
+        lines = ['{"log":"connection refused\\n","stream":"stderr","time":"2024-01-15T12:00:00Z"}']
+        events = parser.parse(lines)
+        assert len(events) == 1
+        assert events[0].source == "docker"
+        assert "connection refused" in events[0].message
+        assert events[0].level == LogLevel.ERROR
+
+    def test_parse_raw_docker_line(self):
+        parser = DockerParser()
+        lines = ["2024-01-15T12:00:00Z stdout F warning: disk full"]
+        events = parser.parse(lines)
+        assert len(events) == 1
+        assert events[0].source == "docker"
+        assert "disk full" in events[0].message
+        assert events[0].level == LogLevel.WARNING
