@@ -2,7 +2,9 @@
 
 [![CI](https://github.com/MentalVibez/dotish-ai-log-analyzer/actions/workflows/ci.yml/badge.svg)](https://github.com/MentalVibez/dotish-ai-log-analyzer/actions/workflows/ci.yml)
 
-DevOps engineers spend a lot of time scanning logs and hunting for root causes. This app lets you upload `.log` files and get **errors**, **warnings**, **suspected root causes**, and **suggested fixes** from an AI (Ollama) in one step.
+**DevOps log-analysis tool** — upload Nginx, Syslog, or Docker logs and get **errors**, **warnings**, **root causes**, and **suggested fixes** from an LLM in one step. Built for ops teams and SRE-style incident triage, not for multi-agent orchestration or general-purpose chat.
+
+> **Portfolio note:** This repo is a **single-purpose DevOps tool** (log parsing → LLM analysis → actionable report). It is separate from [AI Agent Orchestrator](https://github.com/MentalVibez/ai-agent-orchestrator), which is a **multi-agent system** (MCP tool calling, RAG, workflows, OTel tracing). Same stack family (Python, FastAPI); different problem space.
 
 <!-- Screenshot or GIF: upload → analyze → results. Add a file path here when you have one, e.g. docs/screenshot.png or docs/demo.gif -->
 
