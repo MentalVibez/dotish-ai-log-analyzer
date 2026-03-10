@@ -1,0 +1,5 @@
+Jan 15 12:00:00 host kernel: [ 1234.567890] Out of memory: Kill process 12345 (nginx) score 800 or sacrifice child
+Jan 15 12:00:01 host sshd[1234]: Failed password for root from 10.0.0.1 port 22 ssh2
+Jan 15 12:00:02 host app: database connection pool exhausted
+Jan 15 12:00:03 host app: warning: disk usage above 90%
+<34>1 2024-01-15T12:00:04Z host myapp 1 2 - [meta key="value"] critical: service timeout

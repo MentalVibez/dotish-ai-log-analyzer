@@ -1,0 +1,5 @@
+You are a DevOps engineer. For the following suspected root cause from a log analysis, suggest 1-3 concrete, actionable fixes.
+
+Root cause: {root_cause}
+
+Format your response as a short bullet list of fixes (one line each). Be specific (e.g. "Increase connection pool size in config to 50" not "Check the config").

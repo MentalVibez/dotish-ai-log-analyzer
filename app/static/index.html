@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Log Analyzer</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+    h1 { margin-top: 0; }
+    .upload { margin: 1rem 0; }
+    input[type="file"] { margin-right: 0.5rem; }
+    button { padding: 0.5rem 1rem; cursor: pointer; background: #2563eb; color: white; border: none; border-radius: 6px; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .loading { color: #64748b; margin-top: 0.5rem; }
+    .error { color: #dc2626; margin-top: 0.5rem; }
+    section { margin-top: 1.5rem; }
+    section h2 { font-size: 1rem; margin-bottom: 0.5rem; color: #475569; }
+    .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; }
+    .card pre, .card p { margin: 0; font-size: 0.875rem; white-space: pre-wrap; word-break: break-word; }
+    ul { margin: 0.25rem 0 0 1rem; padding: 0; }
+    .empty { color: #94a3b8; font-style: italic; }
+  </style>
+</head>
+<body>
+  <h1>AI Log Analyzer</h1>
+  <p>Upload a <code>.log</code> or <code>.txt</code> file to extract errors, warnings, root causes, and suggested fixes.</p>
+
+  <div class="upload">
+    <input type="file" id="file" accept=".log,.txt" />
+    <button type="button" id="analyze">Analyze</button>
+  </div>
+  <div class="loading" id="loading" hidden>Analyzing… (this may take a minute with Ollama)</div>
+  <div class="error" id="error" hidden></div>
+
+  <div id="results" hidden>
+    <section>
+      <h2>Errors</h2>
+      <div id="errors"></div>
+    </section>
+    <section>
+      <h2>Warnings</h2>
+      <div id="warnings"></div>
+    </section>
+    <section>
+      <h2>Root causes</h2>
+      <div id="root-causes"></div>
+    </section>
+    <section>
+      <h2>Suggested fixes</h2>
+      <div id="fixes"></div>
+    </section>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('file');
+    const analyzeBtn = document.getElementById('analyze');
+    const loading = document.getElementById('loading');
+    const errEl = document.getElementById('error');
+    const results = document.getElementById('results');
+    const errorsEl = document.getElementById('errors');
+    const warningsEl = document.getElementById('warnings');
+    const rootCausesEl = document.getElementById('root-causes');
+    const fixesEl = document.getElementById('fixes');
+
+    function showError(msg) {
+      errEl.textContent = msg;
+      errEl.hidden = false;
+      results.hidden = true;
+    }
+    function clearError() {
+      errEl.textContent = '';
+      errEl.hidden = true;
+    }
+
+    function renderEvents(arr, container) {
+      if (!arr || arr.length === 0) {
+        container.innerHTML = '<p class="empty">None</p>';
+        return;
+      }
+      container.innerHTML = arr.map(e => {
+        const msg = e.message || e.raw || JSON.stringify(e);
+        const ts = e.timestamp ? new Date(e.timestamp).toISOString() : '';
+        return `<div class="card"><pre>${ts ? ts + ' ' : ''}${escapeHtml(msg)}</pre></div>`;
+      }).join('');
+    }
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    analyzeBtn.addEventListener('click', async () => {
+      const file = fileInput.files[0];
+      if (!file) {
+        showError('Please select a file.');
+        return;
+      }
+      clearError();
+      loading.hidden = false;
+      analyzeBtn.disabled = true;
+      results.hidden = true;
+
+      const form = new FormData();
+      form.append('file', file);
+
+      try {
+        const res = await fetch('/api/analyze', { method: 'POST', body: form });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          showError(data.detail || res.statusText || 'Request failed');
+          return;
+        }
+        renderEvents(data.errors, errorsEl);
+        renderEvents(data.warnings, warningsEl);
+        if (!data.root_causes || data.root_causes.length === 0) {
+          rootCausesEl.innerHTML = '<p class="empty">None</p>';
+        } else {
+          rootCausesEl.innerHTML = '<ul>' + data.root_causes.map(c => '<li>' + escapeHtml(c) + '</li>').join('') + '</ul>';
+        }
+        if (!data.suggested_fixes || data.suggested_fixes.length === 0) {
+          fixesEl.innerHTML = '<p class="empty">None</p>';
+        } else {
+          fixesEl.innerHTML = data.suggested_fixes.map(f => 
+            `<div class="card"><p><strong>Cause:</strong> ${escapeHtml(f.cause)}</p><p><strong>Fix:</strong> ${escapeHtml(f.fix)}</p></div>`
+          ).join('');
+        }
+        results.hidden = false;
+      } catch (e) {
+        showError(e.message || 'Network error');
+      } finally {
+        loading.hidden = true;
+        analyzeBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

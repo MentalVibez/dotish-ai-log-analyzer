@@ -1,0 +1,6 @@
+2024/01/15 12:00:00 [error] 1234#0: connect() failed (111: Connection refused) while connecting to upstream
+2024/01/15 12:00:01 [warn] 1234#0: upstream server temporarily disabled
+2024/01/15 12:00:02 [error] 1234#0: open() "/var/cache/nginx/fastcgi/1/00/0000000001" failed (28: No space left on device)
+127.0.0.1 - - [15/Jan/2024:12:00:03 +0000] "GET /api/health HTTP/1.1" 200 42 "-" "curl/7.0"
+127.0.0.1 - - [15/Jan/2024:12:00:04 +0000] "GET /api/users HTTP/1.1" 502 0 "-" "-"
+127.0.0.1 - - [15/Jan/2024:12:00:05 +0000] "GET /missing HTTP/1.1" 404 162 "-" "Mozilla/5.0"
